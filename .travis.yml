@@ -1,0 +1,5 @@
+language: java
+jdk: oraclejdk8
+before_install:
+- openssl aes-256-cbc -K $encrypted_da4b4971e30e_key -iv $encrypted_da4b4971e30e_iv
+  -in src/main/resources/application.yml.enc -out src/main/resources/application.yml -d
