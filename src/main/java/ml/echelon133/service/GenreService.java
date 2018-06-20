@@ -1,11 +1,13 @@
 package ml.echelon133.service;
 
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Genre;
 import ml.echelon133.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenreService implements IGenreService {
@@ -25,5 +27,15 @@ public class GenreService implements IGenreService {
     @Override
     public Genre save(Genre genre) {
         return genreRepository.save(genre);
+    }
+
+    @Override
+    public Genre findById(Long id) throws ResourceNotFoundException {
+        Optional<Genre> genre = genreRepository.findById(id);
+        if (genre.isPresent()) {
+            return genre.get();
+        } else {
+            throw new ResourceNotFoundException("Genre with this id not found");
+        }
     }
 }
