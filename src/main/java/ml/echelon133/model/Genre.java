@@ -19,6 +19,7 @@ public class Genre {
     @Length(min=10, max=1500)
     private String description;
 
+    public Genre() {}
     public Genre(String name, String description) {
         this.name = name;
         this.description = description;
