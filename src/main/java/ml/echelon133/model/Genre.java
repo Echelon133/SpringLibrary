@@ -1,5 +1,7 @@
 package ml.echelon133.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +15,8 @@ public class Genre {
     private Long id;
 
     private String name;
+
+    @Length(min=10, max=1500)
     private String description;
 
     public Genre(String name, String description) {
