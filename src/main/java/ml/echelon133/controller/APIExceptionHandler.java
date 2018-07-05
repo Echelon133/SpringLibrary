@@ -1,5 +1,6 @@
 package ml.echelon133.controller;
 
+import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.message.IErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,14 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessage.setTimestamp(new Date());
         errorMessage.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FailedFieldValidationException.class)
+    protected ResponseEntity<IErrorMessage> handleFailedFieldValidationException(FailedFieldValidationException ex, WebRequest request) {
+        IErrorMessage errorMessage = getErrorMessage();
+        errorMessage.setMessages(ex.getTextErrors());
+        errorMessage.setTimestamp(new Date());
+        errorMessage.setPath(request.getDescription(false));
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 }
