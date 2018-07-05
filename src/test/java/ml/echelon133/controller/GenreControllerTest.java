@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -48,9 +49,11 @@ public class GenreControllerTest {
     @InjectMocks
     private APIExceptionHandler exceptionHandler;
 
-    private JacksonTester<List<Genre>> jsonGenre;
+    private JacksonTester<List<Genre>> jsonGenres;
 
     private JacksonTester<GenreDto> jsonGenreDto;
+
+    private JacksonTester<Genre> jsonGenre;
 
 
     @Before
@@ -85,7 +88,7 @@ public class GenreControllerTest {
         List<Genre> genres = Arrays.asList(testGenre1, testGenre2);
 
         // Prepare expected JSON
-        JsonContent<List<Genre>> jsonGenreContent = jsonGenre.write(genres);
+        JsonContent<List<Genre>> jsonGenreContent = jsonGenres.write(genres);
 
         // Given
         given(genreService.findAll()).willReturn(genres);
@@ -153,5 +156,33 @@ public class GenreControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).contains("name length must be between 1 and 50");
         assertThat(response.getContentAsString()).contains("description length must be between 10 and 1500");
+    }
+
+    @Test
+    public void newGenreIsSavedCorrectly() throws Exception {
+        // Sent json
+        GenreDto genreDto = new GenreDto("test name", "test description of this genre");
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // After "saving"
+        Genre savedGenre = new Genre("test name", "test description of this genre");
+        savedGenre.setId(1L);
+
+        // Expected json
+        JsonContent<Genre> genreJsonContent = jsonGenre.write(savedGenre);
+
+        // Given
+        given(genreService.save(any(Genre.class))).willReturn(savedGenre);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/genres")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
     }
 }
