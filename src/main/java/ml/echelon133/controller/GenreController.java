@@ -1,15 +1,16 @@
 package ml.echelon133.controller;
 
+import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Genre;
+import ml.echelon133.model.dto.GenreDto;
 import ml.echelon133.service.IGenreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,9 +28,19 @@ public class GenreController {
         return new ResponseEntity<>(genres, HttpStatus.OK);
     }
 
-    @RequestMapping(value= "api/genres/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "api/genres/{id}", method = RequestMethod.GET)
     public ResponseEntity<Genre> getGenre(@PathVariable Long id) throws ResourceNotFoundException {
         Genre genre = genreService.findById(id);
         return new ResponseEntity<>(genre, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/genres", method = RequestMethod.POST)
+    public ResponseEntity<Genre> postGenre(@Valid @RequestBody GenreDto genreDto, BindingResult result) throws FailedFieldValidationException {
+        if (result.hasErrors()) {
+            throw new FailedFieldValidationException(result.getFieldErrors());
+        }
+        Genre genre = new Genre(genreDto.getName(), genreDto.getDescription());
+        Genre savedGenre = genreService.save(genre);
+        return new ResponseEntity<>(savedGenre, HttpStatus.CREATED);
     }
 }
