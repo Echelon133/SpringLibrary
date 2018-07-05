@@ -1,8 +1,10 @@
 package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Genre;
+import ml.echelon133.model.dto.GenreDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IGenreService;
@@ -27,7 +29,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GenreControllerTest {
@@ -47,6 +49,8 @@ public class GenreControllerTest {
     private APIExceptionHandler exceptionHandler;
 
     private JacksonTester<List<Genre>> jsonGenre;
+
+    private JacksonTester<GenreDto> jsonGenreDto;
 
 
     @Before
@@ -109,5 +113,45 @@ public class GenreControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getContentAsString()).contains("Genre with this id not found");
+    }
+
+    @Test
+    public void newGenreNullValuesAreHandled() throws Exception {
+        GenreDto genreDto = new GenreDto(null, null);
+
+        // Prepare json
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/genres")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name must not be null");
+        assertThat(response.getContentAsString()).contains("description must not be null");
+    }
+
+    @Test
+    public void newGenreInvalidFieldLengthsAreHandled() throws Exception {
+        GenreDto genreDto = new GenreDto("", "test");
+
+        // Prepare json
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/genres")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name length must be between 1 and 50");
+        assertThat(response.getContentAsString()).contains("description length must be between 10 and 1500");
     }
 }
