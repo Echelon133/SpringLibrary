@@ -9,4 +9,5 @@ public interface IGenreService {
     List<Genre> findAll();
     Genre save(Genre genre);
     Genre findById(Long id) throws ResourceNotFoundException;
+    boolean deleteById(Long id) throws ResourceNotFoundException;
 }

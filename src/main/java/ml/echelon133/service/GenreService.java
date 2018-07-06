@@ -38,4 +38,16 @@ public class GenreService implements IGenreService {
             throw new ResourceNotFoundException("Genre with this id not found");
         }
     }
+
+    @Override
+    public boolean deleteById(Long id) throws ResourceNotFoundException {
+        boolean exists = genreRepository.existsById(id);
+        if (exists) {
+            genreRepository.deleteById(id);
+            exists = genreRepository.existsById(id);
+        } else {
+            throw new ResourceNotFoundException("Genre with this id not found");
+        }
+        return !exists;
+    }
 }
