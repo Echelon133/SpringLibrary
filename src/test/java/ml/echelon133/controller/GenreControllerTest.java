@@ -1,7 +1,6 @@
 package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.GenreDto;
@@ -184,5 +183,25 @@ public class GenreControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
+    }
+
+    @Test
+    public void patchNotExistingGenreHandlerWorks() throws Exception {
+        GenreDto genreDto = new GenreDto("test genre", "test description of the genre");
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // Given
+        given(genreService.findById(1L)).willThrow(new ResourceNotFoundException("Genre with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Genre with this id not found");
     }
 }
