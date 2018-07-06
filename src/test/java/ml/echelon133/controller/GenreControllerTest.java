@@ -273,4 +273,34 @@ public class GenreControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
     }
+
+    @Test
+    public void deleteGenreDeletesExistingGenre() throws Exception {
+        // Given
+        given(genreService.deleteById(1L)).willReturn(true);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).contains("{\"deleted\":true}");
+    }
+
+    @Test
+    public void deleteNotExistingGenreHandlerWorks() throws Exception {
+        // Given
+        given(genreService.deleteById(1L)).willThrow(new ResourceNotFoundException("Genre with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Genre with this id not found");
+    }
 }
