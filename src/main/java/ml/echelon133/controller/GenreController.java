@@ -11,7 +11,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GenreController {
@@ -55,6 +57,18 @@ public class GenreController {
         genre.setDescription(genreDto.getDescription());
         Genre savedGenre = genreService.save(genre);
         return new ResponseEntity<>(savedGenre, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/genres/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Map> deleteGenre(@PathVariable Long id) throws ResourceNotFoundException {
+        Map<String, Boolean> response = new HashMap<>();
+        boolean deleted = genreService.deleteById(id);
+        if (deleted) {
+            response.put("deleted", true);
+        } else {
+            response.put("deleted", false);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
