@@ -204,4 +204,73 @@ public class GenreControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getContentAsString()).contains("Genre with this id not found");
     }
+
+    @Test
+    public void patchGenreNullValuesAreHandled() throws Exception {
+        GenreDto genreDto = new GenreDto(null, null);
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name must not be null");
+        assertThat(response.getContentAsString()).contains("description must not be null");
+    }
+
+    @Test
+    public void patchGenreInvalidFieldLengthsAreHandled() throws Exception {
+        GenreDto genreDto = new GenreDto("", "test");
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name length must be between 1 and 50");
+        assertThat(response.getContentAsString()).contains("description length must be between 10 and 1500");
+    }
+
+    @Test
+    public void patchGenreIsSavedCorrectly() throws Exception {
+        // Sent json
+        GenreDto genreDto = new GenreDto("test name", "test description of this genre");
+        JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
+
+        // Before "saving"
+        Genre genre = new Genre("initial name", "test description of this genre");
+        genre.setId(1L);
+
+        // After "saving"
+        Genre savedGenre = new Genre(genreDto.getName(), genreDto.getDescription());
+        savedGenre.setId(1L);
+
+        // Expected json
+        JsonContent<Genre> genreJsonContent = jsonGenre.write(savedGenre);
+
+        // Given
+        given(genreService.findById(1L)).willReturn(genre);
+        given(genreService.save(genre)).willReturn(savedGenre);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
+    }
 }
