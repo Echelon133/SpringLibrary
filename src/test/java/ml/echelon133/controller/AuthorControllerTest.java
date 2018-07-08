@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -49,6 +50,8 @@ public class AuthorControllerTest {
     private JacksonTester<List<Author>> jsonAuthors;
 
     private JacksonTester<AuthorDto> jsonAuthorDto;
+
+    private JacksonTester<Author> jsonAuthor;
 
     @Before
     public void setup() {
@@ -160,6 +163,30 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void newAuthorIsSavedCorrectly() throws Exception {}
+    public void newAuthorIsSavedCorrectly() throws Exception {
+        // Sent json
+        AuthorDto authorDto = new AuthorDto("test author", "test description of this author");
+        JsonContent<AuthorDto> genreDtoJsonContent = jsonAuthorDto.write(authorDto);
 
+        // After "saving"
+        Author savedAuthor = new Author("test author", "test description of this author");
+        savedAuthor.setId(1L);
+
+        // Expected json
+        JsonContent<Author> genreJsonContent = jsonAuthor.write(savedAuthor);
+
+        // Given
+        given(authorService.save(any(Author.class))).willReturn(savedAuthor);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/authors")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(genreDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
+    }
 }
