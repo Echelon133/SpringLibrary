@@ -118,6 +118,27 @@ public class GenreControllerTest {
     }
 
     @Test
+    public void getExistingGenreWorks() throws Exception {
+        Genre genre = new Genre("test genre", "test genre description");
+        genre.setId(1L);
+
+        // Expected json
+        JsonContent<Genre> genreJsonContent = jsonGenre.write(genre);
+
+        // Given
+        given(genreService.findById(1L)).willReturn(genre);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/genres/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
+    }
+
+    @Test
     public void newGenreNullValuesAreHandled() throws Exception {
         GenreDto genreDto = new GenreDto(null, null);
 
