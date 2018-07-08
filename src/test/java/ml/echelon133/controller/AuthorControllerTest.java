@@ -2,6 +2,7 @@ package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ml.echelon133.model.Author;
+import ml.echelon133.model.dto.AuthorDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IAuthorService;
@@ -46,6 +47,8 @@ public class AuthorControllerTest {
     private APIExceptionHandler exceptionHandler;
 
     private JacksonTester<List<Author>> jsonAuthors;
+
+    private JacksonTester<AuthorDto> jsonAuthorDto;
 
     @Before
     public void setup() {
@@ -117,5 +120,46 @@ public class AuthorControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(jsonAuthorContent.getJson());
     }
+
+    @Test
+    public void newAuthorNullValuesAreHandled() throws Exception {
+        AuthorDto author = new AuthorDto(null, null);
+
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(author);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/authors/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name must not be null");
+        assertThat(response.getContentAsString()).contains("description must not be null");
+    }
+
+    @Test
+    public void newAuthorInvalidFieldLengthsAreHandled() throws Exception {
+        AuthorDto author = new AuthorDto("", "desc");
+
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(author);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/authors")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name length must be between 1 and 100");
+        assertThat(response.getContentAsString()).contains("description length must be between 10 and 3000");
+    }
+
+    @Test
+    public void newAuthorIsSavedCorrectly() throws Exception {}
 
 }
