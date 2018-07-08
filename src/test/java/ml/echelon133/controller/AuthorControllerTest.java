@@ -84,7 +84,7 @@ public class AuthorControllerTest {
         List<Author> authors = Arrays.asList(author1, author2);
 
         // Expected Json
-        JsonContent<List<Author>> jsonAuthorContent = jsonAuthors.write(authors);
+        JsonContent<List<Author>> authorJsonContent = jsonAuthors.write(authors);
 
         // Given
         given(authorService.findAll()).willReturn(authors);
@@ -96,7 +96,7 @@ public class AuthorControllerTest {
 
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonAuthorContent.getJson());
+        assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class AuthorControllerTest {
         List<Author> expectedAuthors = Arrays.asList(author1, author2);
 
         // Expected json
-        JsonContent<List<Author>> jsonAuthorContent = jsonAuthors.write(expectedAuthors);
+        JsonContent<List<Author>> authorJsonContent = jsonAuthors.write(expectedAuthors);
 
         // Given
         given(authorService.findAllByNameContaining("John")).willReturn(expectedAuthors);
@@ -121,7 +121,28 @@ public class AuthorControllerTest {
 
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(jsonAuthorContent.getJson());
+        assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
+    }
+
+    @Test
+    public void getExistingAuthorWorks() throws Exception {
+        Author author = new Author("test author", "test author description");
+        author.setId(1L);
+
+        // Expected json
+        JsonContent<Author> authorJsonContent = jsonAuthor.write(author);
+
+        // Given
+        given(authorService.findById(1L)).willReturn(author);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
     }
 
     @Test
@@ -166,14 +187,14 @@ public class AuthorControllerTest {
     public void newAuthorIsSavedCorrectly() throws Exception {
         // Sent json
         AuthorDto authorDto = new AuthorDto("test author", "test description of this author");
-        JsonContent<AuthorDto> genreDtoJsonContent = jsonAuthorDto.write(authorDto);
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
 
         // After "saving"
         Author savedAuthor = new Author("test author", "test description of this author");
         savedAuthor.setId(1L);
 
         // Expected json
-        JsonContent<Author> genreJsonContent = jsonAuthor.write(savedAuthor);
+        JsonContent<Author> authorJsonContent = jsonAuthor.write(savedAuthor);
 
         // Given
         given(authorService.save(any(Author.class))).willReturn(savedAuthor);
@@ -182,11 +203,11 @@ public class AuthorControllerTest {
         MockHttpServletResponse response = mvc.perform(
                 post("/api/authors")
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(genreDtoJsonContent.getJson())
+                        .content(authorDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.getContentAsString()).isEqualTo(genreJsonContent.getJson());
+        assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
     }
 }
