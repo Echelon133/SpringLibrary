@@ -1,6 +1,7 @@
 package ml.echelon133.controller;
 
 import ml.echelon133.exception.FailedFieldValidationException;
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.dto.AuthorDto;
 import ml.echelon133.service.IAuthorService;
@@ -32,6 +33,12 @@ public class AuthorController {
             authors = authorService.findAllByNameContaining(name);
         }
         return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/authors/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Author> getAuthor(@PathVariable Long id) throws ResourceNotFoundException {
+        Author author = authorService.findById(id);
+        return new ResponseEntity<>(author, HttpStatus.OK);
     }
 
     @RequestMapping(value = "api/authors", method = RequestMethod.POST)
