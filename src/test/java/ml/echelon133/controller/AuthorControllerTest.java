@@ -1,6 +1,7 @@
 package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.dto.AuthorDto;
 import ml.echelon133.model.message.ErrorMessage;
@@ -122,6 +123,21 @@ public class AuthorControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
+    }
+
+    @Test
+    public void getNotExistingAuthorHandlerWorks() throws Exception {
+        // Given
+        given(authorService.findById(1L)).willThrow(new ResourceNotFoundException("Author with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Author with this id not found");
     }
 
     @Test
