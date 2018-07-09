@@ -314,4 +314,34 @@ public class AuthorControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
     }
+
+    @Test
+    public void deleteAuthorDeletesExistingAuthor() throws Exception {
+        // Given
+        given(authorService.deleteById(1L)).willReturn(true);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).contains("{\"deleted\":true}");
+    }
+
+    @Test
+    public void deleteNotExistingAuthorHandlerWorks() throws Exception {
+        // Given
+        given(authorService.deleteById(1L)).willThrow(new ResourceNotFoundException("Author with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Author with this id not found");
+    }
 }
