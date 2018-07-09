@@ -50,4 +50,17 @@ public class AuthorController {
         Author savedAuthor = authorService.save(author);
         return new ResponseEntity<>(savedAuthor, HttpStatus.CREATED);
     }
+
+    @RequestMapping(value = "api/authors/{id}", method = RequestMethod.PATCH)
+    public ResponseEntity<Author> patchAuthor(@PathVariable Long id, @Valid @RequestBody AuthorDto authorDto, BindingResult result)
+        throws FailedFieldValidationException, ResourceNotFoundException {
+        if (result.hasErrors()) {
+            throw new FailedFieldValidationException(result.getFieldErrors());
+        }
+        Author author = authorService.findById(id);
+        author.setName(authorDto.getName());
+        author.setDescription(authorDto.getDescription());
+        Author savedAuthor = authorService.save(author);
+        return new ResponseEntity<>(savedAuthor, HttpStatus.OK);
+    }
 }
