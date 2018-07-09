@@ -12,7 +12,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class AuthorController {
@@ -62,5 +64,17 @@ public class AuthorController {
         author.setDescription(authorDto.getDescription());
         Author savedAuthor = authorService.save(author);
         return new ResponseEntity<>(savedAuthor, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/authors/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Map> deleteAuthor(@PathVariable Long id) throws ResourceNotFoundException {
+        Map<String, Boolean> response = new HashMap<>();
+        boolean deleted = authorService.deleteById(id);
+        if (deleted) {
+            response.put("deleted", true);
+        } else {
+            response.put("deleted", false);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
