@@ -226,4 +226,92 @@ public class AuthorControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
     }
+
+    @Test
+    public void patchNotExistingAuthorHandlerWorks() throws Exception {
+        AuthorDto authorDto = new AuthorDto("test author", "test description of the author");
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
+
+        // Given
+        given(authorService.findById(1L)).willThrow(new ResourceNotFoundException("Author with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Author with this id not found");
+    }
+
+    @Test
+    public void patchAuthorNullValuesAreHandled() throws Exception {
+        AuthorDto authorDto = new AuthorDto(null, null);
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name must not be null");
+        assertThat(response.getContentAsString()).contains("description must not be null");
+    }
+
+    @Test
+    public void patchAuthorInvalidFieldLengthsAreHandled() throws Exception {
+        AuthorDto authorDto = new AuthorDto("", "test");
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("name length must be between 1 and 100");
+        assertThat(response.getContentAsString()).contains("description length must be between 10 and 3000");
+    }
+
+    @Test
+    public void patchAuthorIsSavedCorrectly() throws Exception {
+        // Sent json
+        AuthorDto authorDto = new AuthorDto("test name", "test description of this author");
+        JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
+
+        // Before "saving"
+        Author author = new Author("initial name", "test description of this author");
+
+        // After "saving"
+        Author savedAuthor = new Author(authorDto.getName(), authorDto.getDescription());
+        savedAuthor.setId(1L);
+
+        // Expected json
+        JsonContent<Author> authorJsonContent = jsonAuthor.write(savedAuthor);
+
+        // Given
+        given(authorService.findById(1L)).willReturn(author);
+        given(authorService.save(author)).willReturn(savedAuthor);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/authors/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(authorDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(authorJsonContent.getJson());
+    }
 }
