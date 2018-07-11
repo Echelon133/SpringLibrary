@@ -1,5 +1,7 @@
 package ml.echelon133.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +30,7 @@ public class Book {
     )
     private List<Genre> genres;
 
+    @JsonIgnore
     @OneToOne(mappedBy="bookInfoOwner", cascade=CascadeType.PERSIST)
     private BookInfo bookInfo;
 
