@@ -132,4 +132,22 @@ public class BookControllerTest {
         assertThat(response.getContentAsString()).isEqualTo(jsonBookContent.getJson());
     }
 
+    @Test
+    public void getNotEmptyBooksListFilteredByGenre() throws Exception {
+        // Expected json
+        JsonContent<List<Book>> jsonBookContent = jsonBooks.write(firstGenreBooks);
+
+        // Given
+        given(bookService.findAllByGenresContainingName("genre1")).willReturn(firstGenreBooks);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books").param("genre", "genre1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(jsonBookContent.getJson());
+    }
+
 }
