@@ -26,7 +26,12 @@ public class BookController {
     public ResponseEntity<List<Book>> getBooks(@RequestParam(value = "title", required = false) String title,
                                                @RequestParam(value = "author", required = false) String author,
                                                @RequestParam(value = "genre", required = false) String genre) {
-        List<Book> books = bookService.findAll();
+        List<Book> books;
+        if (genre != null) {
+            books = bookService.findAllByGenresContainingName(genre);
+        } else {
+            books = bookService.findAll();
+        }
         return new ResponseEntity<>(books , HttpStatus.OK);
     }
 }
