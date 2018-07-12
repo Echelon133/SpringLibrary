@@ -48,6 +48,8 @@ public class BookControllerTest {
 
     private JacksonTester<List<Book>> jsonBooks;
 
+    private JacksonTester<Book> jsonBook;
+
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
     private static List<Book> firstAuthorBooks;
@@ -181,6 +183,26 @@ public class BookControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(jsonBookContent.getJson());
+    }
+
+    @Test
+    public void getExistingBookWorks() throws Exception {
+        Book book = allBooks.get(0);
+
+        // Expected json
+        JsonContent<Book> bookJsonContent = jsonBook.write(book);
+
+        // Given
+        given(bookService.findById(1L)).willReturn(book);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(bookJsonContent.getJson());
     }
 
 }
