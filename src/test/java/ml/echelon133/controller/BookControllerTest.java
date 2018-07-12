@@ -1,6 +1,7 @@
 package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Genre;
@@ -203,6 +204,21 @@ public class BookControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(bookJsonContent.getJson());
+    }
+
+    @Test
+    public void getNotExistingBookHandlerWorks() throws Exception {
+        // Given
+        given(bookService.findById(1L)).willThrow(new ResourceNotFoundException("Book with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Book with this id not found");
     }
 
 }
