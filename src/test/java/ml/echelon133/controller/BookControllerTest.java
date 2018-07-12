@@ -50,9 +50,7 @@ public class BookControllerTest {
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
-    private static List<Book> secondGenreBooks;
     private static List<Book> firstAuthorBooks;
-    private static List<Book> secondAuthorBooks;
     private static List<Book> firstTitleBooks;
 
     @BeforeClass
@@ -85,9 +83,7 @@ public class BookControllerTest {
 
         allBooks = Arrays.asList(book1, book2, book3);
         firstGenreBooks = Arrays.asList(book1, book3);
-        secondGenreBooks = Arrays.asList(book2, book3);
         firstAuthorBooks = Arrays.asList(book1, book3);
-        secondAuthorBooks = Arrays.asList(book2, book3);
         firstTitleBooks = Arrays.asList(book1);
     }
 
@@ -162,6 +158,24 @@ public class BookControllerTest {
         // When
         MockHttpServletResponse response = mvc.perform(
                 get("/api/books").param("title", "First")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(jsonBookContent.getJson());
+    }
+
+    @Test
+    public void getNotEmptyBooksListFilteredByAuthor() throws Exception {
+        // Expected json
+        JsonContent<List<Book>> jsonBookContent = jsonBooks.write(firstAuthorBooks);
+
+        // Given
+        given(bookService.findAllByAuthorsContainingName("author1")).willReturn(firstAuthorBooks);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books").param("author", "author1")
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
         // Then
