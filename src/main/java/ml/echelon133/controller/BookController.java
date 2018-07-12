@@ -27,10 +27,12 @@ public class BookController {
                                                @RequestParam(value = "author", required = false) String author,
                                                @RequestParam(value = "genre", required = false) String genre) {
         List<Book> books;
-        if (genre != null) {
-            books = bookService.findAllByGenresContainingName(genre);
-        } else if (title != null) {
+        if (title != null) {
             books = bookService.findAllByTitleContaining(title);
+        } else if (author != null) {
+            books = bookService.findAllByAuthorsContainingName(author);
+        } else if (genre != null) {
+            books = bookService.findAllByGenresContainingName(genre);
         } else {
             books = bookService.findAll();
         }
