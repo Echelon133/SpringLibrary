@@ -29,6 +29,8 @@ public class BookController {
         List<Book> books;
         if (genre != null) {
             books = bookService.findAllByGenresContainingName(genre);
+        } else if (title != null) {
+            books = bookService.findAllByTitleContaining(title);
         } else {
             books = bookService.findAll();
         }
