@@ -288,7 +288,6 @@ public class BookControllerTest {
 
         // Given
         given(authorService.findById(anyLong())).willThrow(new ResourceNotFoundException("Author with this id not found"));
-        given(genreService.findById(1L)).willReturn(new Genre("Some genre name", "Some genre description"));
 
         // When
         MockHttpServletResponse response = mvc.perform(
