@@ -5,9 +5,12 @@ import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Genre;
+import ml.echelon133.model.dto.BookDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
+import ml.echelon133.service.IAuthorService;
 import ml.echelon133.service.IBookService;
+import ml.echelon133.service.IGenreService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -41,6 +45,12 @@ public class BookControllerTest {
     @Mock
     private IBookService bookService;
 
+    @Mock
+    private IAuthorService authorService;
+
+    @Mock
+    private IGenreService genreService;
+
     @InjectMocks
     private BookController bookController;
 
@@ -50,6 +60,8 @@ public class BookControllerTest {
     private JacksonTester<List<Book>> jsonBooks;
 
     private JacksonTester<Book> jsonBook;
+
+    private JacksonTester<BookDto> jsonBookDto;
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
@@ -219,6 +231,74 @@ public class BookControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getContentAsString()).contains("Book with this id not found");
+    }
+
+    @Test
+    public void newBookNullValuesAreHandled() throws Exception {
+        BookDto bookDto = new BookDto();
+
+        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/books/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(bookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("title must not be null");
+        assertThat(response.getContentAsString()).contains("authorIds must not be null");
+        assertThat(response.getContentAsString()).contains("genreIds must not be null");
+    }
+
+    @Test
+    public void newBookInvalidFieldSizesAreHandled() throws Exception {
+        BookDto bookDto = new BookDto();
+        bookDto.setTitle("");
+        bookDto.setAuthorIds(new ArrayList<>());
+        bookDto.setGenreIds(new ArrayList<>());
+
+        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/books/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(bookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("title length must be between 1 and 255");
+        assertThat(response.getContentAsString()).contains("authorIds size must be between 1 and 10");
+        assertThat(response.getContentAsString()).contains("genreIds size must be between 1 and 10");
+    }
+
+    @Test
+    public void newBookCreationFailsWhenAuthorIdDoesNotExist() throws Exception {
+        BookDto bookDto = new BookDto();
+        bookDto.setTitle("Test title of this book");
+        bookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L, 2L, 3L)));
+        bookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
+
+        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+
+        // Given
+        given(authorService.findById(anyLong())).willThrow(new ResourceNotFoundException("Author with this id not found"));
+        given(genreService.findById(1L)).willReturn(new Genre("Some genre name", "Some genre description"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/books/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(bookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Author with this id not found");
     }
 
 }
