@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-public class BookDto {
+public class NewBookDto {
 
     @NotNull
     @Length(min=1, max=255)
