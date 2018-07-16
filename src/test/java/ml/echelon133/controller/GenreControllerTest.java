@@ -207,7 +207,7 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void patchNotExistingGenreHandlerWorks() throws Exception {
+    public void putNotExistingGenreHandlerWorks() throws Exception {
         GenreDto genreDto = new GenreDto("test genre", "test description of the genre");
         JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
 
@@ -216,7 +216,7 @@ public class GenreControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/genres/1")
+                put("/api/genres/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(genreDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -227,13 +227,13 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void patchGenreNullValuesAreHandled() throws Exception {
+    public void putGenreNullValuesAreHandled() throws Exception {
         GenreDto genreDto = new GenreDto(null, null);
         JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/genres/1")
+                put("/api/genres/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(genreDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -245,13 +245,13 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void patchGenreInvalidFieldLengthsAreHandled() throws Exception {
+    public void putGenreInvalidFieldLengthsAreHandled() throws Exception {
         GenreDto genreDto = new GenreDto("", "test");
         JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/genres/1")
+                put("/api/genres/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(genreDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -263,7 +263,7 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void patchGenreIsSavedCorrectly() throws Exception {
+    public void putGenreIsSavedCorrectly() throws Exception {
         // Sent json
         GenreDto genreDto = new GenreDto("test name", "test description of this genre");
         JsonContent<GenreDto> genreDtoJsonContent = jsonGenreDto.write(genreDto);
@@ -285,7 +285,7 @@ public class GenreControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/genres/1")
+                put("/api/genres/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(genreDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();

@@ -46,8 +46,8 @@ public class GenreController {
         return new ResponseEntity<>(savedGenre, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "api/genres/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<Genre> patchGenre(@PathVariable Long id, @Valid @RequestBody GenreDto genreDto, BindingResult result)
+    @RequestMapping(value = "api/genres/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Genre> putGenre(@PathVariable Long id, @Valid @RequestBody GenreDto genreDto, BindingResult result)
             throws ResourceNotFoundException, FailedFieldValidationException {
         if (result.hasErrors()) {
             throw new FailedFieldValidationException(result.getFieldErrors());
