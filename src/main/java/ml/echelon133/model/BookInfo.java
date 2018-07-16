@@ -1,6 +1,8 @@
 package ml.echelon133.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 
@@ -8,7 +10,8 @@ import javax.persistence.*;
 public class BookInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "gen")
+    @GenericGenerator(name="gen", strategy = "foreign", parameters = @Parameter(name="property", value="bookInfoOwner"))
     private Long id;
     private Integer numberOfPages;
     private String language;
@@ -17,7 +20,6 @@ public class BookInfo {
 
     @OneToOne
     @JsonIgnore
-    @JoinColumn(name="fk_book_id")
     private Book bookInfoOwner;
 
     public BookInfo() {}
