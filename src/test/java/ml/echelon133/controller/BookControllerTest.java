@@ -6,6 +6,7 @@ import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.NewBookDto;
+import ml.echelon133.model.dto.PatchBookDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IAuthorService;
@@ -63,6 +64,8 @@ public class BookControllerTest {
     private JacksonTester<Book> jsonBook;
 
     private JacksonTester<NewBookDto> jsonBookDto;
+
+    private JacksonTester<PatchBookDto> jsonPatchBookDto;
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
@@ -355,6 +358,56 @@ public class BookControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(bookJsonContent.getJson());
+    }
+
+    @Test
+    public void patchNotExistingBookHandlerWorks() throws Exception {
+        PatchBookDto patchBookDto = new PatchBookDto();
+        patchBookDto.setTitle("Test");
+        patchBookDto.setAuthorIds(Arrays.asList(1L, 2L));
+        patchBookDto.setGenreIds(Arrays.asList(1L, 2L));
+
+        JsonContent<PatchBookDto> patchBookDtoJsonContent = jsonPatchBookDto.write(patchBookDto);
+
+        // Given
+        given(bookService.findById(1L)).willThrow(new ResourceNotFoundException("Book with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Book with this id not found");
+    }
+
+    @Test
+    public void patchBookInvalidFieldLengthsAreHandled() throws Exception {
+        PatchBookDto patchBookDto = new PatchBookDto();
+        patchBookDto.setTitle("");
+        patchBookDto.setAuthorIds(new ArrayList<>());
+        patchBookDto.setGenreIds(new ArrayList<>());
+
+        JsonContent<PatchBookDto> patchBookDtoJsonContent = jsonPatchBookDto.write(patchBookDto);
+
+        // Given
+        given(bookService.findById(1L)).willReturn(allBooks.get(0));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("genreIds size must be between 1 and 10");
+        assertThat(response.getContentAsString()).contains("title length must be between 1 and 255");
+        assertThat(response.getContentAsString()).contains("authorIds size must be between 1 and 10");
     }
 
 }
