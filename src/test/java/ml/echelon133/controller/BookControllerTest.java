@@ -410,4 +410,39 @@ public class BookControllerTest {
         assertThat(response.getContentAsString()).contains("authorIds size must be between 1 and 10");
     }
 
+    @Test
+    public void patchBookReturnsPatchedBookContents() throws Exception {
+        PatchBookDto patchBookDto = new PatchBookDto();
+        patchBookDto.setTitle("Test title");
+
+        // Sent json
+        JsonContent<PatchBookDto> patchBookDtoJsonContent = jsonPatchBookDto.write(patchBookDto);
+
+        // Initial book
+        Book book = allBooks.get(0);
+
+        // "Saved book"
+        Book savedBook = allBooks.get(0);
+        savedBook.setTitle(patchBookDto.getTitle());
+
+        // Expected json
+        JsonContent<Book> bookJsonContent = jsonBook.write(savedBook);
+
+        // Given
+        given(bookService.findById(1L)).willReturn(book);
+        given(bookService.save(book)).willReturn(savedBook);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(bookJsonContent.getJson());
+
+    }
+
 }
