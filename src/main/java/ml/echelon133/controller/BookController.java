@@ -5,7 +5,7 @@ import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Genre;
-import ml.echelon133.model.dto.BookDto;
+import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.service.IAuthorService;
 import ml.echelon133.service.IBookService;
 import ml.echelon133.service.IGenreService;
@@ -59,7 +59,7 @@ public class BookController {
     }
 
     @RequestMapping(value = "api/books", method = RequestMethod.POST)
-    public ResponseEntity<Book> postBook(@Valid @RequestBody BookDto bookDto, BindingResult result)
+    public ResponseEntity<Book> postBook(@Valid @RequestBody NewBookDto newBookDto, BindingResult result)
             throws FailedFieldValidationException, ResourceNotFoundException {
         if (result.hasErrors()) {
             throw new FailedFieldValidationException(result.getFieldErrors());
@@ -67,15 +67,15 @@ public class BookController {
         Set<Author> bookAuthors = new HashSet<>();
         List<Genre> bookGenres = new ArrayList<>();
 
-        for (Long authorId : bookDto.getAuthorIds()) {
+        for (Long authorId : newBookDto.getAuthorIds()) {
             bookAuthors.add(authorService.findById(authorId));
         }
 
-        for (Long genreId : bookDto.getGenreIds()) {
+        for (Long genreId : newBookDto.getGenreIds()) {
             bookGenres.add(genreService.findById(genreId));
         }
 
-        Book book = new Book(bookDto.getTitle(), bookAuthors, bookGenres);
+        Book book = new Book(newBookDto.getTitle(), bookAuthors, bookGenres);
         Book savedBook = bookService.save(book);
         return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
     }
