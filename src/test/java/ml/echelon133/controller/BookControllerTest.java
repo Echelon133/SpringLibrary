@@ -393,9 +393,6 @@ public class BookControllerTest {
 
         JsonContent<PatchBookDto> patchBookDtoJsonContent = jsonPatchBookDto.write(patchBookDto);
 
-        // Given
-        given(bookService.findById(1L)).willReturn(allBooks.get(0));
-
         // When
         MockHttpServletResponse response = mvc.perform(
                 patch("/api/books/1")
