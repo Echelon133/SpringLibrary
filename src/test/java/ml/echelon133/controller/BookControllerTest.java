@@ -5,7 +5,7 @@ import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Genre;
-import ml.echelon133.model.dto.BookDto;
+import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IAuthorService;
@@ -62,7 +62,7 @@ public class BookControllerTest {
 
     private JacksonTester<Book> jsonBook;
 
-    private JacksonTester<BookDto> jsonBookDto;
+    private JacksonTester<NewBookDto> jsonBookDto;
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
@@ -236,9 +236,9 @@ public class BookControllerTest {
 
     @Test
     public void newBookNullValuesAreHandled() throws Exception {
-        BookDto bookDto = new BookDto();
+        NewBookDto newBookDto = new NewBookDto();
 
-        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+        JsonContent<NewBookDto> bookDtoJsonContent = jsonBookDto.write(newBookDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
@@ -256,12 +256,12 @@ public class BookControllerTest {
 
     @Test
     public void newBookInvalidFieldSizesAreHandled() throws Exception {
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle("");
-        bookDto.setAuthorIds(new ArrayList<>());
-        bookDto.setGenreIds(new ArrayList<>());
+        NewBookDto newBookDto = new NewBookDto();
+        newBookDto.setTitle("");
+        newBookDto.setAuthorIds(new ArrayList<>());
+        newBookDto.setGenreIds(new ArrayList<>());
 
-        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+        JsonContent<NewBookDto> bookDtoJsonContent = jsonBookDto.write(newBookDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
@@ -279,12 +279,12 @@ public class BookControllerTest {
 
     @Test
     public void newBookCreationFailsWhenAuthorIdDoesNotExist() throws Exception {
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle("Test title of this book");
-        bookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L, 2L, 3L)));
-        bookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
+        NewBookDto newBookDto = new NewBookDto();
+        newBookDto.setTitle("Test title of this book");
+        newBookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L, 2L, 3L)));
+        newBookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
 
-        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+        JsonContent<NewBookDto> bookDtoJsonContent = jsonBookDto.write(newBookDto);
 
         // Given
         given(authorService.findById(anyLong())).willThrow(new ResourceNotFoundException("Author with this id not found"));
@@ -303,12 +303,12 @@ public class BookControllerTest {
 
     @Test
     public void newBookCreationFailsWhenGenreIdDoesNotExist() throws Exception {
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle("Test title of this book");
-        bookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L, 2L, 3L)));
-        bookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
+        NewBookDto newBookDto = new NewBookDto();
+        newBookDto.setTitle("Test title of this book");
+        newBookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L, 2L, 3L)));
+        newBookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
 
-        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+        JsonContent<NewBookDto> bookDtoJsonContent = jsonBookDto.write(newBookDto);
 
         // Given
         given(authorService.findById(anyLong())).willReturn(new Author("Test author name", "Test author description"));
@@ -329,12 +329,12 @@ public class BookControllerTest {
     @Test
     public void newBookIsSavedCorrectly() throws Exception {
         // Sent json
-        BookDto bookDto = new BookDto();
-        bookDto.setTitle("First book");
-        bookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L)));
-        bookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
+        NewBookDto newBookDto = new NewBookDto();
+        newBookDto.setTitle("First book");
+        newBookDto.setAuthorIds(new ArrayList<Long>(Arrays.asList(1L)));
+        newBookDto.setGenreIds(new ArrayList<Long>(Arrays.asList(1L)));
 
-        JsonContent<BookDto> bookDtoJsonContent = jsonBookDto.write(bookDto);
+        JsonContent<NewBookDto> bookDtoJsonContent = jsonBookDto.write(newBookDto);
 
         // After "saving"
         Book savedBook = allBooks.get(0); // any working book
