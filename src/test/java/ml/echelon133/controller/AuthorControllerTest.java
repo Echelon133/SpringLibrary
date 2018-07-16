@@ -228,7 +228,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void patchNotExistingAuthorHandlerWorks() throws Exception {
+    public void putNotExistingAuthorHandlerWorks() throws Exception {
         AuthorDto authorDto = new AuthorDto("test author", "test description of the author");
         JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
 
@@ -237,7 +237,7 @@ public class AuthorControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/authors/1")
+                put("/api/authors/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(authorDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -248,13 +248,13 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void patchAuthorNullValuesAreHandled() throws Exception {
+    public void putAuthorNullValuesAreHandled() throws Exception {
         AuthorDto authorDto = new AuthorDto(null, null);
         JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/authors/1")
+                put("/api/authors/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(authorDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -266,13 +266,13 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void patchAuthorInvalidFieldLengthsAreHandled() throws Exception {
+    public void putAuthorInvalidFieldLengthsAreHandled() throws Exception {
         AuthorDto authorDto = new AuthorDto("", "test");
         JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/authors/1")
+                put("/api/authors/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(authorDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -284,7 +284,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void patchAuthorIsSavedCorrectly() throws Exception {
+    public void putAuthorIsSavedCorrectly() throws Exception {
         // Sent json
         AuthorDto authorDto = new AuthorDto("test name", "test description of this author");
         JsonContent<AuthorDto> authorDtoJsonContent = jsonAuthorDto.write(authorDto);
@@ -305,7 +305,7 @@ public class AuthorControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                patch("/api/authors/1")
+                put("/api/authors/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .content(authorDtoJsonContent.getJson())
                         .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
