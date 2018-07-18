@@ -17,6 +17,7 @@ public class BookInfo {
     private String language;
     private Integer publicationYear;
     private String description;
+    private String isbn;
 
     @OneToOne
     @JsonIgnore
@@ -62,6 +63,14 @@ public class BookInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public Book getBookInfoOwner() {
