@@ -17,10 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class BookController {
@@ -116,6 +113,18 @@ public class BookController {
 
         Book patchedBook = bookService.save(book);
         return new ResponseEntity<>(patchedBook, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/books/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Map> deleteBook(@PathVariable Long id) throws ResourceNotFoundException {
+        Map<String, Boolean> response = new HashMap<>();
+        boolean deleted = bookService.deleteById(id);
+        if (deleted) {
+            response.put("deleted", true);
+        } else {
+            response.put("deleted", false);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
