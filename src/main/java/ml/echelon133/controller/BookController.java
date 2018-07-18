@@ -4,10 +4,12 @@ import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
+import ml.echelon133.model.BookInfo;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.model.dto.PatchBookDto;
 import ml.echelon133.service.IAuthorService;
+import ml.echelon133.service.IBookInfoService;
 import ml.echelon133.service.IBookService;
 import ml.echelon133.service.IGenreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,15 @@ public class BookController {
     private IBookService bookService;
     private IAuthorService authorService;
     private IGenreService genreService;
+    private IBookInfoService bookInfoService;
 
     @Autowired
-    public BookController(IBookService bookService, IAuthorService authorService, IGenreService genreService) {
+    public BookController(IBookService bookService, IAuthorService authorService,
+                          IGenreService genreService, IBookInfoService bookInfoService) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.genreService = genreService;
+        this.bookInfoService = bookInfoService;
     }
 
     @RequestMapping(value = "api/books", method = RequestMethod.GET)
@@ -127,4 +132,9 @@ public class BookController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "api/books/{id}/bookInfo", method = RequestMethod.GET)
+    public ResponseEntity<BookInfo> getBookInfo(@PathVariable Long id) throws ResourceNotFoundException {
+        BookInfo bookInfo = bookInfoService.findById(id);
+        return new ResponseEntity<>(bookInfo, HttpStatus.OK);
+    }
 }
