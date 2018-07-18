@@ -439,7 +439,37 @@ public class BookControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(bookJsonContent.getJson());
-
     }
+
+    @Test
+    public void deleteBookDeletesExistingBook() throws Exception {
+        // Given
+        given(bookService.deleteById(1L)).willReturn(true);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).contains("{\"deleted\":true}");
+    }
+
+    @Test
+    public void deleteNotExistingBookHandlerWorks() throws Exception {
+        // Given
+        given(bookService.deleteById(1L)).willThrow(new ResourceNotFoundException("Book with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                delete("/api/books/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Book with this id not found");
+    }
+
 
 }
