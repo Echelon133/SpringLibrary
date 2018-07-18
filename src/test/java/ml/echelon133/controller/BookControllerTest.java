@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Author;
 import ml.echelon133.model.Book;
+import ml.echelon133.model.BookInfo;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.model.dto.PatchBookDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IAuthorService;
+import ml.echelon133.service.IBookInfoService;
 import ml.echelon133.service.IBookService;
 import ml.echelon133.service.IGenreService;
 import org.junit.Before;
@@ -53,6 +55,9 @@ public class BookControllerTest {
     @Mock
     private IGenreService genreService;
 
+    @Mock
+    private IBookInfoService bookInfoService;
+
     @InjectMocks
     private BookController bookController;
 
@@ -66,6 +71,8 @@ public class BookControllerTest {
     private JacksonTester<NewBookDto> jsonBookDto;
 
     private JacksonTester<PatchBookDto> jsonPatchBookDto;
+
+    private JacksonTester<BookInfo> jsonBookInfo;
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
@@ -471,5 +478,42 @@ public class BookControllerTest {
         assertThat(response.getContentAsString()).contains("Book with this id not found");
     }
 
+    @Test
+    public void getExistingBookBookInfoContents() throws Exception {
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setId(1L);
+        bookInfo.setDescription("test book info description");
+        bookInfo.setLanguage("English");
+        bookInfo.setNumberOfPages(1000);
 
+        // Expected json
+        JsonContent<BookInfo> bookInfoJsonContent = jsonBookInfo.write(bookInfo);
+
+        // Given
+        given(bookInfoService.findById(1L)).willReturn(bookInfo);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(bookInfoJsonContent.getJson());
+    }
+
+    @Test
+    public void getNotExistingBookBookInfoHandlerWorks() throws Exception {
+        // Given
+        given(bookInfoService.findById(1L)).willThrow(new ResourceNotFoundException("BookInfo with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("BookInfo with this id not found");
+    }
 }
