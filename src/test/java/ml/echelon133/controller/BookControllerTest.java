@@ -8,6 +8,7 @@ import ml.echelon133.model.BookInfo;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.model.dto.PatchBookDto;
+import ml.echelon133.model.dto.PatchBookInfoDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IAuthorService;
@@ -65,14 +66,11 @@ public class BookControllerTest {
     private APIExceptionHandler exceptionHandler;
 
     private JacksonTester<List<Book>> jsonBooks;
-
     private JacksonTester<Book> jsonBook;
-
     private JacksonTester<NewBookDto> jsonBookDto;
-
     private JacksonTester<PatchBookDto> jsonPatchBookDto;
-
     private JacksonTester<BookInfo> jsonBookInfo;
+    private JacksonTester<PatchBookInfoDto> jsonPatchBookInfoDto;
 
     private static List<Book> allBooks;
     private static List<Book> firstGenreBooks;
@@ -511,6 +509,110 @@ public class BookControllerTest {
         MockHttpServletResponse response = mvc.perform(
                 get("/api/books/1/bookInfo")
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("BookInfo with this id not found");
+    }
+
+    @Test
+    public void patchBookInfoInvalidFieldLengthsAreHandled() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setLanguage("aa");
+        patchBookInfoDto.setDescription("test");
+
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("description length must be between 10 and 500");
+        assertThat(response.getContentAsString()).contains("language length must be between 3 and 30");
+    }
+
+    @Test
+    public void patchBookInfoPositiveFieldsRequirePositiveIntegers() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setNumberOfPages(0);
+        patchBookInfoDto.setPublicationYear(0);
+
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("numberOfPages must be greater than 0");
+        assertThat(response.getContentAsString()).contains("publicationYear must be greater than 0");
+    }
+
+    @Test
+    public void patchBookInfoNumberDigitsAreValidated() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setNumberOfPages(99999);
+        patchBookInfoDto.setPublicationYear(99999);
+
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("numberOfPages numeric value out of bounds");
+        assertThat(response.getContentAsString()).contains("publicationYear numeric value out of bounds");
+    }
+
+    @Test
+    public void patchBookInfoInvalidISBNIsRejected() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setIsbn("testISBN");
+
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("invalid ISBN");
+    }
+
+    @Test
+    public void patchNotExistingBookInfoHandlerWorks() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setNumberOfPages(200);
+
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // Given
+        given(bookInfoService.findById(1L)).willThrow(new ResourceNotFoundException("BookInfo with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
