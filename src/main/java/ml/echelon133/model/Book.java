@@ -31,7 +31,7 @@ public class Book {
     private List<Genre> genres;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, mappedBy="bookInfoOwner", cascade=CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy="bookInfoOwner", cascade=CascadeType.ALL)
     private BookInfo bookInfo;
 
     public Book() {}
