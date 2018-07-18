@@ -618,4 +618,44 @@ public class BookControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getContentAsString()).contains("BookInfo with this id not found");
     }
+
+    @Test
+    public void patchBookInfoReturnsPatchedContents() throws Exception {
+        PatchBookInfoDto patchBookInfoDto = new PatchBookInfoDto();
+        patchBookInfoDto.setNumberOfPages(200);
+        patchBookInfoDto.setPublicationYear(2005);
+        patchBookInfoDto.setDescription("test description");
+        patchBookInfoDto.setLanguage("English");
+
+        // Sent JSON
+        JsonContent<PatchBookInfoDto> patchBookInfoDtoJsonContent = jsonPatchBookInfoDto.write(patchBookInfoDto);
+
+        // Initial BookInfo
+        BookInfo bookInfo = new BookInfo();
+
+        // "Saved" BookInfo
+        BookInfo savedBookInfo = new BookInfo();
+        savedBookInfo.setNumberOfPages(patchBookInfoDto.getNumberOfPages());
+        savedBookInfo.setPublicationYear(patchBookInfoDto.getPublicationYear());
+        savedBookInfo.setDescription(patchBookInfoDto.getDescription());
+        savedBookInfo.setLanguage(patchBookInfoDto.getLanguage());
+
+        // Expected json
+        JsonContent<BookInfo> bookInfoJsonContent = jsonBookInfo.write(savedBookInfo);
+
+        // Given
+        given(bookInfoService.findById(1L)).willReturn(bookInfo);
+        given(bookInfoService.save(bookInfo)).willReturn(savedBookInfo);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/books/1/bookInfo")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(patchBookInfoDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(bookInfoJsonContent.getJson());
+    }
 }
