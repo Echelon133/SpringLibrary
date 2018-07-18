@@ -8,6 +8,7 @@ import ml.echelon133.model.BookInfo;
 import ml.echelon133.model.Genre;
 import ml.echelon133.model.dto.NewBookDto;
 import ml.echelon133.model.dto.PatchBookDto;
+import ml.echelon133.model.dto.PatchBookInfoDto;
 import ml.echelon133.service.IAuthorService;
 import ml.echelon133.service.IBookInfoService;
 import ml.echelon133.service.IBookService;
@@ -136,5 +137,41 @@ public class BookController {
     public ResponseEntity<BookInfo> getBookInfo(@PathVariable Long id) throws ResourceNotFoundException {
         BookInfo bookInfo = bookInfoService.findById(id);
         return new ResponseEntity<>(bookInfo, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/books/{id}/bookInfo", method = RequestMethod.PATCH)
+    public ResponseEntity<BookInfo> patchBookInfo(@PathVariable Long id,
+                                                  @Valid @RequestBody PatchBookInfoDto patchBookInfoDto,
+                                                  BindingResult result) throws ResourceNotFoundException, FailedFieldValidationException {
+        if (result.hasErrors()) {
+            throw new FailedFieldValidationException(result.getFieldErrors());
+        }
+
+        BookInfo bookInfo = bookInfoService.findById(id);
+
+        Integer newNumberOfPages = patchBookInfoDto.getNumberOfPages();
+        String newLanguage = patchBookInfoDto.getLanguage();
+        Integer newPublicationYear = patchBookInfoDto.getPublicationYear();
+        String newDescription = patchBookInfoDto.getDescription();
+        String newISBN = patchBookInfoDto.getIsbn();
+
+        if (newNumberOfPages != null) {
+            bookInfo.setNumberOfPages(newNumberOfPages);
+        }
+        if (newLanguage != null) {
+            bookInfo.setLanguage(newLanguage);
+        }
+        if (newPublicationYear != null) {
+            bookInfo.setPublicationYear(newPublicationYear);
+        }
+        if (newDescription != null) {
+            bookInfo.setDescription(newDescription);
+        }
+        if (newISBN != null) {
+            bookInfo.setIsbn(newISBN);
+        }
+
+        BookInfo savedBookInfo = bookInfoService.save(bookInfo);
+        return new ResponseEntity<>(savedBookInfo, HttpStatus.OK);
     }
 }
