@@ -20,7 +20,7 @@ public class AuthorityService implements IAuthorityService {
     public Authority findByAuthority(String authority) throws ResourceNotFoundException {
         Authority auth = authorityRepository.findAuthorityByAuthority(authority);
         if (auth == null) {
-            throw new ResourceNotFoundException("Authority with this name not found")
+            throw new ResourceNotFoundException("Authority with this name not found");
         }
         return auth;
     }
