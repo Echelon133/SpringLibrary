@@ -4,9 +4,11 @@ import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Authority;
 import ml.echelon133.repository.AuthorityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class AuthorityService implements IAuthorityService {
 
     private AuthorityRepository authorityRepository;
