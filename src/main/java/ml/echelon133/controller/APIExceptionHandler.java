@@ -1,7 +1,9 @@
 package ml.echelon133.controller;
 
 import ml.echelon133.exception.FailedFieldValidationException;
+import ml.echelon133.exception.NewUserValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
+import ml.echelon133.exception.UsernameAlreadyTakenException;
 import ml.echelon133.model.message.IErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 @ControllerAdvice
@@ -44,5 +48,23 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessage.setTimestamp(new Date());
         errorMessage.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NewUserValidationException.class)
+    protected ResponseEntity<IErrorMessage> handleNewUserValidationException(NewUserValidationException ex, WebRequest request) {
+        IErrorMessage errorMessage = getErrorMessage();
+        errorMessage.setTimestamp(new Date());
+        errorMessage.setPath(request.getDescription(false));
+        errorMessage.setMessages(ex.getTextErrors());
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    protected ResponseEntity<IErrorMessage> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException ex, WebRequest request) {
+        IErrorMessage errorMessage = getErrorMessage();
+        errorMessage.setTimestamp(new Date());
+        errorMessage.setMessages(Arrays.asList(ex.getMessage()));
+        errorMessage.setPath(request.getDescription(false));
+        return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
     }
 }
