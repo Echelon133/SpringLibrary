@@ -10,7 +10,7 @@ public class NewUserDto {
     @Length(min = 4, max = 50)
     private String username;
 
-    @Length(min = 6)
+    @Length(min = 6, max = 100)
     private String password;
 
     private String password2;
