@@ -50,9 +50,27 @@ public class TokenService implements ITokenService {
         return generatedToken;
     }
 
+    private String removePrefixIfExists(String token) {
+        if (token.startsWith("Bearer ")) {
+            return token.substring(7);
+        } else {
+            return token;
+        }
+    }
+
     @Override
     public String extractUsernameFromToken(String token) {
-        return null;
+        String extractedUsername;
+        String tokenWithoutPrefix = removePrefixIfExists(token);
+        DecodedJWT jwt;
+
+        try {
+            jwt = JWT.decode(tokenWithoutPrefix);
+            extractedUsername = jwt.getClaim("username").asString();
+        } catch (JWTDecodeException ex) {
+            extractedUsername = null;
+        }
+        return extractedUsername;
     }
 
     @Override
