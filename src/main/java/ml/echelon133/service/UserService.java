@@ -49,4 +49,14 @@ public class UserService implements IUserService {
             throw new ResourceNotFoundException("User with this id not found");
         }
     }
+
+    @Override
+    public String findSecretByUsername(String username) throws ResourceNotFoundException {
+        String secret = userRepository.findSecretByUsername(username);
+        if (secret == null) {
+            throw new ResourceNotFoundException("User with this username does not exist, therefore secret was not found");
+        } else {
+            return secret;
+        }
+    }
 }
