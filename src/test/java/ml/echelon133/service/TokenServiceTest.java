@@ -65,6 +65,20 @@ public class TokenServiceTest {
     }
 
     @Test
+    public void generatedTokenWithBearerPrefixValidatesCorrectly() throws Exception {
+        // Given
+        given(userService.findSecretByUsername("testUser")).willReturn("aaaabbbbccccdddd"); // simple, but ok for tests
+
+        // When
+        String generatedToken = tokenService.generateTokenForUser("testUser");
+        generatedToken = "Bearer " + generatedToken;
+        Boolean isTokenValid = tokenService.isValidToken(generatedToken);
+
+        // Then
+        assertThat(isTokenValid).isTrue();
+    }
+
+    @Test
     public void tokenValidationFailsWhenSecretIsInvalid() throws Exception {
         // Given
         given(userService.findSecretByUsername("some-username")).willReturn("aaaazzzzccccdddd");
