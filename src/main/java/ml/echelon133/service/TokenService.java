@@ -75,6 +75,31 @@ public class TokenService implements ITokenService {
 
     @Override
     public Boolean isValidToken(String token) {
-        return null;
+        String tokenWithoutPrefix;
+        String username;
+        String userSecret;
+
+        tokenWithoutPrefix = removePrefixIfExists(token);
+        username = extractUsernameFromToken(token);
+
+        try {
+            userSecret = userService.findSecretByUsername(username);
+        } catch (ResourceNotFoundException ex) {
+            // token cannot be valid if the secret is null
+            return false;
+        }
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC512(userSecret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withClaim("username", username)
+                    .withIssuer("library-app")
+                    .build();
+            DecodedJWT jwt = verifier.verify(tokenWithoutPrefix);
+        } catch (JWTVerificationException exception){
+            return false;
+        }
+
+        return true;
     }
 }
