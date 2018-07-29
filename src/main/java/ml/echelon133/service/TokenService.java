@@ -9,10 +9,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import ml.echelon133.exception.FailedTokenGenerationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
 
+@Service
 public class TokenService implements ITokenService {
 
     private IUserService userService;
