@@ -1,9 +1,6 @@
 package ml.echelon133.controller;
 
-import ml.echelon133.exception.FailedFieldValidationException;
-import ml.echelon133.exception.NewUserValidationException;
-import ml.echelon133.exception.ResourceNotFoundException;
-import ml.echelon133.exception.UsernameAlreadyTakenException;
+import ml.echelon133.exception.*;
 import ml.echelon133.model.message.IErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,5 +63,14 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessage.setMessages(Arrays.asList(ex.getMessage()));
         errorMessage.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(FailedTokenGenerationException.class)
+    protected ResponseEntity<IErrorMessage> handleFailedTokenGenerationException(FailedTokenGenerationException ex, WebRequest request) {
+        IErrorMessage errorMessage = getErrorMessage();
+        errorMessage.setTimestamp(new Date());
+        errorMessage.setMessages(Arrays.asList(ex.getMessage()));
+        errorMessage.setPath(request.getDescription(false));
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 }
