@@ -12,14 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public class JWTAuthenticationProvider implements AuthenticationProvider {
 
+    @Autowired
     private ITokenService tokenService;
-    private UserDetailsService userDetailsService;
 
     @Autowired
-    public JWTAuthenticationProvider(ITokenService tokenService, UserDetailsService userDetailsService) {
-        this.tokenService = tokenService;
-        this.userDetailsService = userDetailsService;
-    }
+    private UserDetailsService userDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
