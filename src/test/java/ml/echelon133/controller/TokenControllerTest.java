@@ -62,7 +62,7 @@ public class TokenControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                get("/api/users/get-token")
+                get("/users/get-token")
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(testPrincipal)).andReturn().getResponse();
 
@@ -85,7 +85,7 @@ public class TokenControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                get("/api/users/get-token")
+                get("/users/get-token")
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(testPrincipal)).andReturn().getResponse();
 

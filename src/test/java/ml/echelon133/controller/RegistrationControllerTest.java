@@ -75,7 +75,7 @@ public class RegistrationControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                post("/api/users/register")
+                post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newUserDtoJsonContent.getJson())
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -96,7 +96,7 @@ public class RegistrationControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                post("/api/users/register")
+                post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newUserDtoJsonContent.getJson())
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -122,7 +122,7 @@ public class RegistrationControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                post("/api/users/register")
+                post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newUserDtoJsonContent.getJson())
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -150,7 +150,7 @@ public class RegistrationControllerTest {
 
         // When
         MockHttpServletResponse response = mvc.perform(
-                post("/api/users/register")
+                post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newUserDtoJsonContent.getJson())
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
