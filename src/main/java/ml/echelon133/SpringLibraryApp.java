@@ -23,7 +23,7 @@ public class SpringLibraryApp {
 
     @Bean
     public ISecretGenerator secretGenerator() {
-        return new SecretGenerator(16);
+        return new SecretGenerator(32);
     }
 
     @Bean
