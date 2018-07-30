@@ -37,7 +37,7 @@ public class RegistrationController {
         this.secretGenerator = secretGenerator;
     }
 
-    @RequestMapping(value = "api/users/register", method = RequestMethod.POST)
+    @RequestMapping(value = "users/register", method = RequestMethod.POST)
     public ResponseEntity<Map> registerUser(@Valid @RequestBody NewUserDto newUserDto, BindingResult result)
             throws NewUserValidationException, UsernameAlreadyTakenException {
 

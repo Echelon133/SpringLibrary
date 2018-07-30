@@ -24,7 +24,7 @@ public class TokenController {
     }
 
 
-    @RequestMapping(value = "api/users/get-token", method = RequestMethod.GET)
+    @RequestMapping(value = "users/get-token", method = RequestMethod.GET)
     public ResponseEntity<Map> getToken(Principal principal) throws FailedTokenGenerationException {
         String username = principal.getName();
         String generatedToken = tokenService.generateTokenForUser(username);
