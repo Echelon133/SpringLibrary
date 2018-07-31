@@ -1,5 +1,6 @@
 package ml.echelon133.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -13,9 +14,14 @@ public class User implements UserDetails {
     private Long id;
 
     private String username;
+
+    @JsonIgnore
     private String password;
+
+    @JsonIgnore
     private String secret;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
             name="user_authorities",
@@ -64,21 +70,25 @@ public class User implements UserDetails {
         this.secret = secret;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
