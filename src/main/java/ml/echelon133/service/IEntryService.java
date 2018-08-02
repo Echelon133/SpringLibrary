@@ -1,5 +1,6 @@
 package ml.echelon133.service;
 
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Entry;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface IEntryService {
     List<Entry> findAllByAddedSince(AddedSince when);
     List<Entry> findAllByReturned(Boolean returned);
     List<Entry> findAll();
+    Entry findById(Long id) throws ResourceNotFoundException;
 }

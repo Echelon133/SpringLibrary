@@ -1,5 +1,6 @@
 package ml.echelon133.service;
 
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Entry;
 import ml.echelon133.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EntryService implements IEntryService {
@@ -68,5 +70,15 @@ public class EntryService implements IEntryService {
     @Override
     public List<Entry> findAll() {
         return entryRepository.findAll();
+    }
+
+    @Override
+    public Entry findById(Long id) throws ResourceNotFoundException {
+        Optional<Entry> entry = entryRepository.findById(id);
+        if (entry.isPresent()) {
+            return entry.get();
+        } else {
+            throw new ResourceNotFoundException("Entry with this id not found");
+        }
     }
 }
