@@ -10,7 +10,7 @@ public class NewEntryDto {
     private Long borrowedBookId;
 
     @NotNull
-    private String borrowingUserUsername;
+    private String borrowerUsername;
 
     public Long getBorrowedBookId() {
         return borrowedBookId;
@@ -20,11 +20,11 @@ public class NewEntryDto {
         this.borrowedBookId = borrowedBookId;
     }
 
-    public String getBorrowingUserUsername() {
-        return borrowingUserUsername;
+    public String getBorrowerUsername() {
+        return borrowerUsername;
     }
 
-    public void setBorrowingUserUsername(String borrowingUserUsername) {
-        this.borrowingUserUsername = borrowingUserUsername;
+    public void setBorrowerUsername(String borrowerUsername) {
+        this.borrowerUsername = borrowerUsername;
     }
 }
