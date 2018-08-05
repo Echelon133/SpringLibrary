@@ -1,14 +1,21 @@
 package ml.echelon133.controller;
 
+import ml.echelon133.exception.FailedFieldValidationException;
+import ml.echelon133.exception.ResourceNotFoundException;
+import ml.echelon133.model.Book;
 import ml.echelon133.model.Entry;
+import ml.echelon133.model.User;
+import ml.echelon133.model.dto.NewEntryDto;
 import ml.echelon133.service.IBookService;
 import ml.echelon133.service.IEntryService;
 import ml.echelon133.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -54,5 +61,19 @@ public class EntryController {
             entries = entryService.findAll();
         }
         return new ResponseEntity<>(entries, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/entries", method = RequestMethod.POST)
+    public ResponseEntity<Entry> postEntry(@Valid @RequestBody NewEntryDto newEntryDto, BindingResult result)
+            throws ResourceNotFoundException, FailedFieldValidationException {
+        if (result.hasErrors()) {
+            throw new FailedFieldValidationException(result.getFieldErrors());
+        }
+        Book book = bookService.findById(newEntryDto.getBorrowedBookId());
+        User user = userService.findUserByUsername(newEntryDto.getBorrowerUsername());
+        Entry entry = new Entry(book, user);
+
+        Entry savedEntry = entryService.save(entry);
+        return new ResponseEntity<>(savedEntry, HttpStatus.CREATED);
     }
 }
