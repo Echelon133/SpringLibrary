@@ -1,12 +1,12 @@
 package ml.echelon133.model.dto;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 
 public class NewEntryDto {
 
     @NotNull
-    @PositiveOrZero
+    @Positive
     private Long borrowedBookId;
 
     @NotNull
