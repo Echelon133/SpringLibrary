@@ -1,7 +1,9 @@
 package ml.echelon133.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.*;
+import ml.echelon133.model.dto.NewEntryDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IBookService;
@@ -27,9 +29,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntryControllerTest {
@@ -55,6 +59,8 @@ public class EntryControllerTest {
     private APIExceptionHandler exceptionHandler;
 
     private JacksonTester<List<Entry>> jsonEntries;
+    private JacksonTester<NewEntryDto> jsonNewEntryDto;
+    private JacksonTester<Entry> jsonEntry;
 
     private static List<Entry> testEntries;
 
@@ -64,7 +70,7 @@ public class EntryControllerTest {
 
         mvc = MockMvcBuilders.standaloneSetup(entryController).setControllerAdvice(exceptionHandler).build();
 
-        //given(context.getBean(IErrorMessage.class)).willReturn(new ErrorMessage());
+        given(context.getBean(IErrorMessage.class)).willReturn(new ErrorMessage());
     }
 
     @BeforeClass
@@ -236,5 +242,116 @@ public class EntryControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(jsonEntriesContent.getJson());
+    }
+
+    @Test
+    public void newEntryNullValuesAreHandled() throws Exception {
+        NewEntryDto newEntryDto = new NewEntryDto();
+
+        JsonContent<NewEntryDto> entryDtoJsonContent = jsonNewEntryDto.write(newEntryDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/entries")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(entryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("borrowerUsername must not be null");
+        assertThat(response.getContentAsString()).contains("borrowedBookId must not be null");
+    }
+
+    @Test
+    public void newEntryBorrowedBookIdIsValidated() throws Exception {
+        NewEntryDto newEntryDto = new NewEntryDto();
+        newEntryDto.setBorrowedBookId(-1L);
+        newEntryDto.setBorrowerUsername("test-username");
+
+        JsonContent<NewEntryDto> entryDtoJsonContent = jsonNewEntryDto.write(newEntryDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/entries")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(entryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("borrowedBookId must be greater than 0");
+    }
+
+    @Test
+    public void newEntryCreationFailsIfBookDoesNotExist() throws Exception {
+        NewEntryDto newEntryDto = new NewEntryDto();
+        newEntryDto.setBorrowedBookId(1L);
+        newEntryDto.setBorrowerUsername("test-username");
+
+        JsonContent<NewEntryDto> entryDtoJsonContent = jsonNewEntryDto.write(newEntryDto);
+
+        // Given
+        given(bookService.findById(1L)).willThrow(new ResourceNotFoundException("Book with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/entries")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(entryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Book with this id not found");
+    }
+
+    @Test
+    public void newEntryCreationFailsIfUsernameNotFound() throws Exception {
+        NewEntryDto newEntryDto = new NewEntryDto();
+        newEntryDto.setBorrowedBookId(1L);
+        newEntryDto.setBorrowerUsername("test-username");
+
+        JsonContent<NewEntryDto> entryDtoJsonContent = jsonNewEntryDto.write(newEntryDto);
+
+        // Given
+        given(userService.findUserByUsername("test-username")).willThrow(new ResourceNotFoundException("User with this username not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/entries")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(entryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("User with this username not found");
+    }
+
+    @Test
+    public void newEntryIsSavedCorrectly() throws Exception {
+        NewEntryDto newEntryDto = new NewEntryDto();
+        newEntryDto.setBorrowedBookId(1L);
+        newEntryDto.setBorrowerUsername("user1");
+
+        JsonContent<NewEntryDto> entryDtoJsonContent = jsonNewEntryDto.write(newEntryDto);
+
+        // Expected json
+        JsonContent<Entry> entryJsonContent = jsonEntry.write(testEntries.get(0));
+
+        // Given
+        given(entryService.save(any(Entry.class))).willReturn(testEntries.get(0));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                post("/api/entries")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(entryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.getContentAsString()).isEqualTo(entryJsonContent.getJson());
     }
 }
