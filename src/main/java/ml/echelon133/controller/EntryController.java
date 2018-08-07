@@ -1,11 +1,13 @@
 package ml.echelon133.controller;
 
+import ml.echelon133.exception.BookAlreadyReturnedException;
 import ml.echelon133.exception.FailedFieldValidationException;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.Book;
 import ml.echelon133.model.Entry;
 import ml.echelon133.model.User;
 import ml.echelon133.model.dto.NewEntryDto;
+import ml.echelon133.model.dto.PatchEntryDto;
 import ml.echelon133.service.IBookService;
 import ml.echelon133.service.IEntryService;
 import ml.echelon133.service.IUserService;
@@ -81,5 +83,30 @@ public class EntryController {
     public ResponseEntity<Entry> getEntry(@PathVariable Long id) throws ResourceNotFoundException {
         Entry entry = entryService.findById(id);
         return new ResponseEntity<>(entry, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "api/entries/{id}", method = RequestMethod.PATCH)
+    public ResponseEntity<Entry> patchEntry(@PathVariable Long id,
+                                            @Valid @RequestBody PatchEntryDto patchEntryDto,
+                                            BindingResult result) throws ResourceNotFoundException,
+                                                                         FailedFieldValidationException,
+                                                                         BookAlreadyReturnedException {
+        if (result.hasErrors()) {
+            throw new FailedFieldValidationException(result.getFieldErrors());
+        }
+
+        Entry entry = entryService.findById(id);
+
+        if (entry.getReturned()) {
+            throw new BookAlreadyReturnedException("Book from this entry was already returned");
+        }
+
+        if (patchEntryDto.getReturned()) {
+            // book was not returned yet
+            entry.returnBook();
+        }
+
+        Entry savedEntry = entryService.save(entry);
+        return new ResponseEntity<>(savedEntry, HttpStatus.OK);
     }
 }
