@@ -354,4 +354,38 @@ public class EntryControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(entryJsonContent.getJson());
     }
+
+    @Test
+    public void getExistingEntryWorks() throws Exception {
+        Entry entry = testEntries.get(0);
+
+        JsonContent<Entry> entryJsonContent = jsonEntry.write(entry);
+
+        // Given
+        given(entryService.findById(1L)).willReturn(entry);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/entries/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(entryJsonContent.getJson());
+    }
+
+    @Test
+    public void getNotExistingEntryHandlerWorks() throws Exception {
+        // Given
+        given(entryService.findById(1L)).willThrow(new ResourceNotFoundException("Entry with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                get("/api/entries/1")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Entry with this id not found");
+    }
 }
