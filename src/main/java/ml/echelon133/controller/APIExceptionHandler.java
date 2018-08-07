@@ -11,7 +11,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -72,5 +71,14 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessage.setMessages(Arrays.asList(ex.getMessage()));
         errorMessage.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BookAlreadyReturnedException.class)
+    protected ResponseEntity<IErrorMessage> handleBookAlreadyReturnedException(BookAlreadyReturnedException ex, WebRequest request) {
+        IErrorMessage errorMessage = getErrorMessage();
+        errorMessage.setMessages(Arrays.asList(ex.getMessage()));
+        errorMessage.setTimestamp(new Date());
+        errorMessage.setPath(request.getDescription(false));
+        return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
     }
 }
