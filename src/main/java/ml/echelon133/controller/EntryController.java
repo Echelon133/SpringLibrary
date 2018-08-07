@@ -76,4 +76,10 @@ public class EntryController {
         Entry savedEntry = entryService.save(entry);
         return new ResponseEntity<>(savedEntry, HttpStatus.CREATED);
     }
+
+    @RequestMapping(value = "api/entries/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Entry> getEntry(@PathVariable Long id) throws ResourceNotFoundException {
+        Entry entry = entryService.findById(id);
+        return new ResponseEntity<>(entry, HttpStatus.OK);
+    }
 }
