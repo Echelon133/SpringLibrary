@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ml.echelon133.exception.ResourceNotFoundException;
 import ml.echelon133.model.*;
 import ml.echelon133.model.dto.NewEntryDto;
+import ml.echelon133.model.dto.PatchEntryDto;
 import ml.echelon133.model.message.ErrorMessage;
 import ml.echelon133.model.message.IErrorMessage;
 import ml.echelon133.service.IBookService;
@@ -33,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -61,6 +63,7 @@ public class EntryControllerTest {
     private JacksonTester<List<Entry>> jsonEntries;
     private JacksonTester<NewEntryDto> jsonNewEntryDto;
     private JacksonTester<Entry> jsonEntry;
+    private JacksonTester<PatchEntryDto> jsonPatchEntryDto;
 
     private static List<Entry> testEntries;
 
@@ -387,5 +390,104 @@ public class EntryControllerTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getContentAsString()).contains("Entry with this id not found");
+    }
+
+    @Test
+    public void patchEntryNullValuesAreHandled() throws Exception {
+        PatchEntryDto patchEntryDto = new PatchEntryDto();
+        patchEntryDto.setReturned(null);
+
+        JsonContent<PatchEntryDto> patchEntryDtoJsonContent = jsonPatchEntryDto.write(patchEntryDto);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/entries/1")
+                        .content(patchEntryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("returned must not be null");
+    }
+
+    @Test
+    public void patchNotExistingEntryHandlerWorks() throws Exception {
+        PatchEntryDto patchEntryDto = new PatchEntryDto();
+        patchEntryDto.setReturned(true);
+
+        JsonContent<PatchEntryDto> patchEntryDtoJsonContent = jsonPatchEntryDto.write(patchEntryDto);
+
+        // Given
+        given(entryService.findById(1L)).willThrow(new ResourceNotFoundException("Entry with this id not found"));
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/entries/1")
+                        .content(patchEntryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getContentAsString()).contains("Entry with this id not found");
+    }
+
+    @Test
+    public void patchBookAlreadyReturnedHandlerWorks() throws Exception {
+        PatchEntryDto patchEntryDto = new PatchEntryDto();
+        patchEntryDto.setReturned(true);
+
+        JsonContent<PatchEntryDto> patchEntryDtoJsonContent = jsonPatchEntryDto.write(patchEntryDto);
+
+        // Entry with book that has already been returned
+        Entry entry = new Entry();
+        entry.setReturned(true);
+
+        // Given
+        given(entryService.findById(1L)).willReturn(entry);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/entries/1")
+                        .content(patchEntryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.getContentAsString()).contains("Book from this entry was already returned");
+    }
+
+    @Test
+    public void patchEntryReturnsPatchedEntryContents() throws Exception {
+        PatchEntryDto patchEntryDto = new PatchEntryDto();
+        patchEntryDto.setReturned(true);
+
+        JsonContent<PatchEntryDto> patchEntryDtoJsonContent = jsonPatchEntryDto.write(patchEntryDto);
+
+        // Entry before patching
+        Entry entry = testEntries.get(0);
+
+        // "Patched" entry
+        Entry patchedEntry = new Entry(entry.getBookBorrowed(), entry.getUserBorrowing());
+        patchedEntry.returnBook();
+
+        JsonContent<Entry> patchedEntryJsonContent = jsonEntry.write(patchedEntry);
+
+        // Given
+        given(entryService.findById(1L)).willReturn(entry);
+        given(entryService.save(entry)).willReturn(patchedEntry);
+
+        // When
+        MockHttpServletResponse response = mvc.perform(
+                patch("/api/entries/1")
+                        .content(patchEntryDtoJsonContent.getJson())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(patchedEntryJsonContent.getJson());
     }
 }
