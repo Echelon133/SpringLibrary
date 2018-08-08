@@ -27,6 +27,11 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/authors           | POST       | JSON containing new author data | Create new author
 |/api/authors/{id}      | PUT        | JSON containing data that is going to replace old data | Replace old author data with new data |
 |/api/authors/{id}      | DELETE     |                    | Delete author that has specified id |
+|/api/genres            | GET        |                    | Displays all existing genres |
+|/api/genres/{id}       | GET        |                    | Displays the genre with specified id |
+|/api/genres            | POST       | JSON containing new genre data | Creates new genre |
+|/api/genres/{id}       | PUT        | JSON containing genre data that is going to replace old data | Replace old genre data with new data |
+|/api/genres/{id}       | DELETE     |                    | Delete genre that has specified id |
 
 
 
