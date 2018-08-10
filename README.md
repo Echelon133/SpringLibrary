@@ -43,6 +43,16 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/books              | POST     | JSON containing new book data | Create a new book |
 |/api/books              | PATCH    | JSON containing data that is going to replace old book data | Update chosen fields of book |
 |/api/books/{id}         | DELETE   |                      | Delete book that has specified id |
+|/api/entries            | GET      |                      | Display all existing entries |
+|/api/entries?returned=  | GET      |                      | Display entries filtered by "returned status". This parameter accepts "true"/"false" values. |
+|/api/entries?bookTitle= | GET      |                      | Display entries filtered by book title |
+|/api/entries?username=  | GET      |                      | Display entries filtered by **exact** username |
+|/api/entries?since=     | GET      |                      | Display entries added since specified time. Accepted values: *day*/*week*/*month*/*year*. If the parameter value does not belong to accepted values, all entries are going to be displayed |
+|/api/entries/{id}       | GET      |                      | Display entry that has specified id |
+|/api/entries            | POST     | JSON containing new entry data | Create a new entry |
+|/api/entries/{id}       | PATCH    | JSON containing data that is going to modify entry status | Update status of the entry that has specified id |
+
+
 
 
 
