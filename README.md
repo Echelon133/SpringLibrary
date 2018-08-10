@@ -53,6 +53,103 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/entries/{id}       | PATCH    | JSON containing data that is going to modify entry status | Update status of the entry that has specified id |
 
 
+### Json objects
 
+#### User registration
 
+* *username* length between 4 and 50
+* *password* length between 6 and 100
+* passwords must match
+
+```JSON
+{
+  "username" : "some-username",
+  "password" : "user-password",
+  "password2" : "user-password"
+}
+```
+
+#### Author create/replace
+
+* *name* length between 1 and 100
+* *description* length between 10 and 3000
+
+```JSON
+{
+  "name" : "author name",
+  "description" : "author description text"
+}
+```
+
+#### Genre create/replace
+
+* *name* length between 1 and 50
+* *description* length between 10 and 1500
+
+```JSON
+{
+  "name" : "genre name",
+  "description" : "genre description text"
+}
+```
+
+#### Book create 
+
+* *title* length between 1 and 255
+* *authorIds* size between 1 and 10
+* *genreIds* size between 1 and 10
+
+```JSON
+{
+  "title" : "New book title",
+  "authorIds" : [1, 2],
+  "genreIds" : [1, 4]
+}
+```
+
+#### Book update
+
+Same JSON as above, but fields that are not updated can be ommited.
+
+#### Book Info update
+
+All fields are optional, so it is possible to ex. update only one field, two fields etc.
+
+* *numberOfPages* allows only positive numbers up to 4 digits
+* *language* length between 3 and 30
+* *publicationYear* allows only positive numbers up to 4 digits
+* *description* length between 10 and 500
+* *isbn* is validated against the ISBN specification 
+
+```JSON
+{
+  "numberOfPages" : 100,
+  "language" : "English",
+  "publicationYear" : 2018,
+  "description" : "book description text",
+  "isbn" : "978-1-56619-909-4"
+}
+```
+
+#### Entry create
+
+* both values are required
+
+```JSON
+{
+  "borrowedBookId" : 5,
+  "borrowerUsername" : "some-user"
+}
+```
+
+#### Entry patch
+
+* *returned* field set to true also sets *dateFinished* field of the entry to the date of the status change
+* once *returned* is set to true it cannot be changed anymore
+
+```JSON
+{
+  "returned" : true
+}
+```
 
