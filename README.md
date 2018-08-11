@@ -13,7 +13,7 @@ Features of this app:
 | Endpoint      | Method     | Data sent with the request | Description |
 |---------------|------------|------------------------|-------------|
 |/users/register| POST       | User registration JSON | On this endpoint new users can be registered |
-|/users/get-token| POST      | Basic authentication data must be provided | After successful authorization token that is valid for 3 days is going to be generated and returned |
+|/users/get-token| GET      | Basic authentication data must be provided | After successful authorization token that is valid for 3 days is going to be generated and returned |
 
 ### API
 
