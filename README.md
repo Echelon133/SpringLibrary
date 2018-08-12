@@ -164,7 +164,7 @@ All fields are optional, so it is possible to ex. update only one field, two fie
 ### Get Genres
 ![GET-GENRES](https://github.com/Echelon133/SpringLibrary/blob/master/screens/3GET-GENRES.png)
 
-### Get Single Genre
+### Get a Single Genre
 ![GET-SINGLE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/4GET-SINGLE-GENRE.png)
 
 ### Replace a Genre
@@ -172,3 +172,23 @@ All fields are optional, so it is possible to ex. update only one field, two fie
 
 ### Delete a Genre
 ![DELETE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/6DELETE-GENRE.png)
+
+### Create an Author
+![CREATE-AUTHOR](https://github.com/Echelon133/SpringLibrary/blob/master/screens/7CREATE-AUTHOR.png)
+
+### Get Authors
+![GET-AUTHORS](https://github.com/Echelon133/SpringLibrary/blob/master/screens/8GET-AUTHORS.png)
+
+### Get a Single Author
+![GET-SINGLE-AUTHOR](https://github.com/Echelon133/SpringLibrary/blob/master/screens/9GET-SINGLE-AUTHOR.png)
+
+### Replace an Author
+![REPLACE-AUTHOR](https://github.com/Echelon133/SpringLibrary/blob/master/screens/10REPLACE-AUTHOR.png)
+
+### Delete an Author
+![DELETE-AUTHOR](https://github.com/Echelon133/SpringLibrary/blob/master/screens/11DELETE-AUTHOR.png)
+
+### Filter Authors By Name
+![FILTER-AUTHOR-BY-NAME](https://github.com/Echelon133/SpringLibrary/blob/master/screens/12FILTER-AUTHOR-BY-NAME.png)
+
+
