@@ -12,7 +12,7 @@ Features of this app:
 
 | Endpoint      | Method     | Data sent with the request | Description |
 |---------------|------------|------------------------|-------------|
-|/users/register| POST       | User registration JSON | On this endpoint new users can be registered |
+|/users/register| POST       | [JSON](https://github.com/Echelon133/SpringLibrary#user-registration) | On this endpoint new users can be registered |
 |/users/get-token| GET      | Basic authentication data must be provided | After successful authorization token that is valid for 3 days is going to be generated and returned |
 
 ### API
@@ -25,13 +25,13 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/authors            | GET      |                | Display all existing authors. 
 |/api/authors?name=      | GET      |                | Display authors filtered by name |
 |/api/authors/{id}       | GET      |                | Display the author with specified id |
-|/api/authors            | POST     | JSON containing new author data | Create a new author
-|/api/authors/{id}       | PUT      | JSON containing data that is going to replace old data | Replace old author data with new data |
+|/api/authors            | POST     | [JSON](https://github.com/Echelon133/SpringLibrary#author-createreplace) | Create a new author
+|/api/authors/{id}       | PUT      | [JSON](https://github.com/Echelon133/SpringLibrary#author-createreplace) | Replace old author data with new data |
 |/api/authors/{id}       | DELETE   |                    | Delete the author that has specified id |
 |/api/genres             | GET      |                    | Display all existing genres |
 |/api/genres/{id}        | GET      |                    | Display the genre with specified id |
-|/api/genres             | POST     | JSON containing new genre data | Create a new genre |
-|/api/genres/{id}        | PUT      | JSON containing genre data that is going to replace old data | Replace old genre data with new data |
+|/api/genres             | POST     | [JSON](https://github.com/Echelon133/SpringLibrary#genre-createreplace) | Create a new genre |
+|/api/genres/{id}        | PUT      | [JSON](https://github.com/Echelon133/SpringLibrary#genre-createreplace) | Replace old genre data with new data |
 |/api/genres/{id}        | DELETE   |                    | Delete genre that has specified id |
 |/api/books              | GET      |                    | Display all existing books |
 |/api/books?title=       | GET      |                    | Display books filtered by title |
@@ -39,9 +39,9 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/books?genre=       | GET      |                    | Display books filtered by genre name|
 |/api/books/{id}         | GET      |                    | Display the book that has specified id|
 |/api/books/{id}/bookInfo| GET      |                    | Display book info of the book that has specified id |
-|/api/books/{id}/bookInfo| PATCH    | JSON containing data that is going to replace old book data | Update chosen fields of book info |
-|/api/books              | POST     | JSON containing new book data | Create a new book |
-|/api/books              | PATCH    | JSON containing data that is going to replace old book data | Update chosen fields of book |
+|/api/books/{id}/bookInfo| PATCH    | [JSON](https://github.com/Echelon133/SpringLibrary#book-info-update)| Update chosen fields of book info |
+|/api/books              | POST     | [JSON](https://github.com/Echelon133/SpringLibrary#book-create) | Create a new book |
+|/api/books              | PATCH    | [JSON](https://github.com/Echelon133/SpringLibrary#book-update) | Update chosen fields of book |
 |/api/books/{id}         | DELETE   |                      | Delete book that has specified id |
 |/api/entries            | GET      |                      | Display all existing entries |
 |/api/entries?returned=  | GET      |                      | Display entries filtered by "returned status". This parameter accepts "true"/"false" values. |
@@ -49,8 +49,8 @@ Only GET endpoints can be used by users without admin privileges. All endpoints 
 |/api/entries?username=  | GET      |                      | Display entries filtered by **exact** username |
 |/api/entries?since=     | GET      |                      | Display entries added since specified time. Accepted values: *day*/*week*/*month*/*year*. If the parameter value does not belong to accepted values, all entries are going to be displayed |
 |/api/entries/{id}       | GET      |                      | Display entry that has specified id |
-|/api/entries            | POST     | JSON containing new entry data | Create a new entry |
-|/api/entries/{id}       | PATCH    | JSON containing data that is going to modify entry status | Update status of the entry that has specified id |
+|/api/entries            | POST     | [JSON](https://github.com/Echelon133/SpringLibrary#entry-create) | Create a new entry |
+|/api/entries/{id}       | PATCH    | [JSON](https://github.com/Echelon133/SpringLibrary#entry-patch) | Update status of the entry that has specified id |
 
 
 ### Json objects
