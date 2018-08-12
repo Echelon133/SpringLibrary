@@ -153,3 +153,22 @@ All fields are optional, so it is possible to ex. update only one field, two fie
 }
 ```
 
+## Screens
+
+### Get Token
+![GET-TOKEN](https://github.com/Echelon133/SpringLibrary/blob/master/screens/1GET-TOKEN.png)
+
+### Create a Genre
+![CREATE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/2CREATE-GENRE.png)
+
+### Get Genres
+![GET-GENRES](https://github.com/Echelon133/SpringLibrary/blob/master/screens/3GET-GENRES.png)
+
+### Get Single Genre
+![GET-SINGLE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/4GET-SINGLE-GENRE.png)
+
+### Replace a Genre
+![REPLACE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/5REPLACE-GENRE.png)
+
+### Delete a Genre
+![DELETE-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/6DELETE-GENRE.png)
