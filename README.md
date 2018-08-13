@@ -191,4 +191,53 @@ All fields are optional, so it is possible to ex. update only one field, two fie
 ### Filter Authors By Name
 ![FILTER-AUTHOR-BY-NAME](https://github.com/Echelon133/SpringLibrary/blob/master/screens/12FILTER-AUTHOR-BY-NAME.png)
 
+### Create a Book
+![CREATE-BOOK](https://github.com/Echelon133/SpringLibrary/blob/master/screens/13CREATE-BOOK.png)
 
+### Get Books
+![GET-BOOKS](https://github.com/Echelon133/SpringLibrary/blob/master/screens/14GET-BOOKS.png)
+
+### Filter Books By Title
+![FILTER-BOOKS-BY-TITLE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/15FILTER-BOOKS-BY-TITLE.png)
+
+### Filter Books By Author
+![FILTER-BOOKS-BY-AUTHOR](https://github.com/Echelon133/SpringLibrary/blob/master/screens/16FILTER-BOOKS-BY-AUTHOR.png)
+
+### Filter Books By Genre
+![FILTER-BOOKS-BY-GENRE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/17FILTER-BOOKS-BY-GENRE.png)
+
+### Get a Single Book
+![GET-SINGLE-BOOK](https://github.com/Echelon133/SpringLibrary/blob/master/screens/18GET-SINGLE-BOOK.png)
+
+### Patch a Book Info
+![PATCH-BOOK-INFO](https://github.com/Echelon133/SpringLibrary/blob/master/screens/19PATCH-BOOK-INFO.png)
+
+### Patch a Book
+![PATCH-BOOK](https://github.com/Echelon133/SpringLibrary/blob/master/screens/20PATCH-BOOK.png)
+
+### Delete a Book
+![DELETE-BOOK](https://github.com/Echelon133/SpringLibrary/blob/master/screens/21DELETE-BOOK.png)
+
+### Create an Entry
+![CREATE-ENTRY](https://github.com/Echelon133/SpringLibrary/blob/master/screens/22CREATE-ENTRY.png)
+
+### Get Entries
+![GET-ENTRIES](https://github.com/Echelon133/SpringLibrary/blob/master/screens/23GET-ENTRIES.png)
+
+### Get a Single Entry
+![GET-SINGLE-ENTRY](https://github.com/Echelon133/SpringLibrary/blob/master/screens/24GET-SINGLE-ENTRY.png)
+
+### Patch an Entry Status
+![PATCH-ENTRY-STATUS](https://github.com/Echelon133/SpringLibrary/blob/master/screens/25PATCH-ENTRY-STATUS.png)
+
+### Filter Entries By Status
+![FILTER-ENTRIES-BY-STATUS](https://github.com/Echelon133/SpringLibrary/blob/master/screens/26FILTER-ENTRIES-BY-STATUS.png)
+
+### Filter Entries By Title
+![FILTER-ENTRIES-BY-TITLE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/27FILTER-ENTRIES-BY-TITLE.png)
+
+### Filter Entries By Username
+![FILTER-ENTRIES-BY-USERNAME](https://github.com/Echelon133/SpringLibrary/blob/master/screens/28FILTER-ENTRIES-BY-USERNAME.png)
+
+### Filter Entries By Date
+![FILTER-ENTRIES-BY-DATE](https://github.com/Echelon133/SpringLibrary/blob/master/screens/29FILTER-ENTRIES-BY-DATE.png)
