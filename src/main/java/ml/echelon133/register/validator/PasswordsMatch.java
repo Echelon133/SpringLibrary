@@ -1,7 +1,5 @@
 package ml.echelon133.register.validator;
 
-import ml.echelon133.register.validator.PasswordsMatchValidator;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Retention;
