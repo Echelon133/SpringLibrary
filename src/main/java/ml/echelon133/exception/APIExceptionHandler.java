@@ -2,8 +2,8 @@ package ml.echelon133.exception;
 
 import ml.echelon133.entry.BookAlreadyReturnedException;
 import ml.echelon133.message.IErrorMessage;
-import ml.echelon133.register.NewUserValidationException;
-import ml.echelon133.register.UsernameAlreadyTakenException;
+import ml.echelon133.register.exception.NewUserValidationException;
+import ml.echelon133.register.exception.UsernameAlreadyTakenException;
 import ml.echelon133.token.FailedTokenGenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
