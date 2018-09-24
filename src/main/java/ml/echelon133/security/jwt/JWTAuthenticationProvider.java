@@ -1,6 +1,6 @@
 package ml.echelon133.security.jwt;
 
-import ml.echelon133.service.ITokenService;
+import ml.echelon133.token.ITokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

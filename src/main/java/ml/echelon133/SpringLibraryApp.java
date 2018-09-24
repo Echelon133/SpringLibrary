@@ -1,7 +1,7 @@
 package ml.echelon133;
 
-import ml.echelon133.model.message.ErrorMessage;
-import ml.echelon133.model.message.IErrorMessage;
+import ml.echelon133.message.ErrorMessage;
+import ml.echelon133.message.IErrorMessage;
 import ml.echelon133.security.secret.ISecretGenerator;
 import ml.echelon133.security.secret.SecretGenerator;
 import org.springframework.boot.SpringApplication;
