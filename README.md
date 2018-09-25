@@ -2,7 +2,7 @@
 
 Features of this app:
 * Custom authentication system based on JWT tokens
-* Error handling of invalid requests
+* Handling of invalid requests
 * CRUD operations on authors, genres, books and entries.
 * Advanced searching with GET parameters
 
@@ -13,7 +13,7 @@ Features of this app:
 | Endpoint      | Method     | Data sent with the request | Description |
 |---------------|------------|------------------------|-------------|
 |/users/register| POST       | [JSON](https://github.com/Echelon133/SpringLibrary#user-registration) | On this endpoint new users can be registered |
-|/users/get-token| GET      | Basic authentication data must be provided | After successful authorization token that is valid for 3 days is going to be generated and returned |
+|/users/get-token| GET      | Basic authentication data must be provided | After successful authorization, token that is going to be valid for 3 days is generated and returned |
 
 ### API
 
