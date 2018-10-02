@@ -26,9 +26,9 @@ public class Entry {
     private Boolean returned;
 
     public Entry() {}
-    public Entry(Book bookBorrowed, User userBorrowed) {
+    public Entry(Book bookBorrowed, User userBorrowing) {
         this.bookBorrowed = bookBorrowed;
-        this.userBorrowing = userBorrowed;
+        this.userBorrowing = userBorrowing;
         this.dateStarted = new Date();
         this.dateFinished = null;
         this.returned = false;
