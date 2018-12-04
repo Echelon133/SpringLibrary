@@ -11,6 +11,8 @@ import ml.echelon133.register.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -37,16 +39,15 @@ public class TokenService implements ITokenService {
             throw new FailedTokenGenerationException("Token could not be generated, because the secret was null");
         }
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 3);
-        Date threeDaysFromNow = cal.getTime();
+        LocalDateTime threeDaysFromNow = LocalDateTime.now().plusDays(3);
+        Date expiresAt = Date.from(threeDaysFromNow.atZone(ZoneId.systemDefault()).toInstant());
 
         algorithm = Algorithm.HMAC512(secret);
         generatedToken = JWT
                 .create()
                 .withClaim("username", username)
                 .withIssuer("library-app")
-                .withExpiresAt(threeDaysFromNow)
+                .withExpiresAt(expiresAt)
                 .sign(algorithm);
 
         return generatedToken;
